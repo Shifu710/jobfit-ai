@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://jobfit-ai.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://jobfit-ai-gamma.vercel.app"),
   title: "JobFit AI | AI Resume & Job Matching",
   description:
     "AI-powered resume matching, skill gap analysis, and bilingual career improvement assistant.",
