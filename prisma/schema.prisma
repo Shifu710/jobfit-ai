@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String   @default("user")
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  resumes  Resume[]
+  jobs     JobDescription[]
+  analyses Analysis[]
+}
+
+model Resume {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  targetRole      String?
+  language        String   @default("en")
+  content         String
+  skills          String[]
+  projects        String[]
+  experienceYears Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  analyses Analysis[]
+}
+
+model JobDescription {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title            String
+  company          String?
+  location         String?
+  workType         String?
+  language         String   @default("en")
+  content          String
+  requiredSkills   String[]
+  niceToHaveSkills String[]
+  source           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  analyses Analysis[]
+}
+
+model Analysis {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeId            String?
+  resume              Resume?  @relation(fields: [resumeId], references: [id])
+  jobId               String?
+  job                 JobDescription? @relation(fields: [jobId], references: [id])
+  title               String
+  status              String   @default("complete")
+  shareToken          String?  @unique
+  overallScore        Int
+  outputLanguage      String   @default("en")
+  analysisType        String   @default("detailed")
+  summary             String
+  strengths           String[]
+  weaknesses          String[]
+  missingSkills       String[]
+  missingKeywords     String[]
+  recommendedKeywords String[]
+  improvedSummary     String?
+  scoreSkills         Int
+  scoreExperience     Int
+  scoreKeywords       Int
+  scoreEducation      Int
+  scoreProjects       Int
+  rawResult           Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  suggestions ResumeSuggestion[]
+  questions   InterviewQuestion[]
+}
+
+model ResumeSuggestion {
+  id         String   @id @default(cuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  original   String
+  improved   String
+  reason     String
+  createdAt  DateTime @default(now())
+}
+
+model InterviewQuestion {
+  id         String   @id @default(cuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  question   String
+  type       String
+  reason     String?
+  answerTips String?
+  createdAt  DateTime @default(now())
+}
+
+model AiGenerationLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String
+  input     String
+  output    String
+  model     String?
+  createdAt DateTime @default(now())
+}
